@@ -2,14 +2,50 @@
 
 # requirement: xl2tpd, curl, dig
 
+##################################
+#
+# Set up username & password
+#
+##################################
+
+function zju_config() {
+    read -p "VPN账号：" vpn_username
+    read -p "VPN密码：" -s vpn_password
+    echo "" # 强制换行
+    read -p "VPN套餐（10/30/50）：" vpn_plan
+    mkdir -p ~/.zju
+    echo $vpn_username > ~/.zju/vpn_username
+    echo $vpn_password > ~/.zju/vpn_password
+    echo $vpn_plan > ~/.zju/vpn_plan
+}
+
+
+##################################
+#
+# Get IP of Gateway
+#
+##################################
+
 function zju_get_ip() {
     ip route show 0/0 | cut -d " " -f 3
 }
+
+##################################
+#
+# Connect/Disconnect ZJUWLAN
+#
+##################################
 
 function zju_connect_wlan() {
     zju_disconnect_wlan
     curl -d "action=login&username=USERNAME_HERE&password=PASSWORD_HERE&ac_id=3&type=1&is_ldap=1&local_auth=1" "http://10.50.200.245/cgi-bin/srun_portal"
 }
+
+##################################
+#
+# Connect/Disconnect VPN
+#
+##################################
 
 # function zju_disconnect_wlan() {
 #     # do nothin
@@ -31,13 +67,25 @@ function zju_set_up_route() {
     ip route add 222.205.0.0/17 dev ppp0 via $GW
 }
 
+##################################
+#
+# DNS Helper
+#
+##################################
+
 function zju_test_dns() {
     (dig baidu.com @$1 +time=1 > /dev/null && echo "$1 ... ok") || echo "$1 ... fail"
 }
 
+##################################
+#
+# Router
+#
+##################################
+
 case "$1" in
     config)
-        # set up username & password
+        zju_config
         ;;
     ip)
         zju_get_ip
@@ -52,6 +100,7 @@ case "$1" in
     dns)
         # set up dns, sometimes dns in zju might fail, here provide some more suggestions
         # auto test each dns & set up
+        # TODO: auto set
         zju_test_dns 10.10.0.21
         zju_test_dns 10.10.0.22
         zju_test_dns 10.10.0.23
