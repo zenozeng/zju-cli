@@ -91,6 +91,7 @@ case "$1" in
         zju_get_ip
         ;;
     wlan)
+        # TODO
         zju_connect_wlan
         ;;
     vpn)
@@ -105,6 +106,9 @@ case "$1" in
         zju_test_dns 10.10.0.22
         zju_test_dns 10.10.0.23
         zju_test_dns 10.202.68.222
+        # Fallback: 阿里公共解析
+        zju_test_dns 223.5.5.5
+        zju_test_dns 223.6.6.6
         ;;
 esac
 
