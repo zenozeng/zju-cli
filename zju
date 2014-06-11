@@ -1,0 +1,62 @@
+#!/bin/bash
+
+# requirement: xl2tpd, curl, dig
+
+function zju_get_ip() {
+    ip route show 0/0 | cut -d " " -f 3
+}
+
+function zju_connect_wlan() {
+    zju_disconnect_wlan
+    curl -d "action=login&username=USERNAME_HERE&password=PASSWORD_HERE&ac_id=3&type=1&is_ldap=1&local_auth=1" "http://10.50.200.245/cgi-bin/srun_portal"
+}
+
+# function zju_disconnect_wlan() {
+#     # do nothin
+# }
+
+# nei wang lu you
+function zju_set_up_route() {
+    $GW = zju_get_ip
+    # from http://blog.robotshell.org/2012/linux-surfing-in-zju-zjg/
+    ip route add 10.0.0.0/8 dev ppp0 via $GW
+    ip route add 58.196.192.0/19 dev ppp0 via $GW
+    ip route add 58.196.224.0/20 dev ppp0 via $GW
+    ip route add 210.32.0.0/20 dev ppp0 via $GW
+    ip route add 210.32.128.0/19 dev ppp0 via $GW
+    ip route add 210.32.160.0/21 dev ppp0 via $GW
+    ip route add 210.32.168.0/22 dev ppp0 via $GW
+    ip route add 210.32.172.0/23 dev ppp0 via $GW
+    ip route add 210.32.176.0/20 dev ppp0 via $GW
+    ip route add 222.205.0.0/17 dev ppp0 via $GW
+}
+
+function zju_test_dns() {
+    (dig baidu.com @$1 +time=1 > /dev/null && echo "$1 ... ok") || echo "$1 ... fail"
+}
+
+case "$1" in
+    config)
+        # set up username & password
+        ;;
+    ip)
+        zju_get_ip
+        ;;
+    wlan)
+        zju_connect_wlan
+        ;;
+    vpn)
+        # if 10.189.xxx => is zjuwlan
+        # else set up route
+        ;;
+    dns)
+        # set up dns, sometimes dns in zju might fail, here provide some more suggestions
+        # auto test each dns & set up
+        zju_test_dns 10.10.0.21
+        zju_test_dns 10.10.0.22
+        zju_test_dns 10.10.0.23
+        zju_test_dns 10.202.68.222
+        ;;
+esac
+
+
