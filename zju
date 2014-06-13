@@ -73,8 +73,13 @@ function zju_set_up_route() {
 #
 ##################################
 
-function zju_test_dns() {
-    (dig baidu.com @$1 +time=1 > /dev/null && echo "$1 ... ok") || echo "$1 ... fail"
+function zju_test_and_set_up_dns() {
+    until [ -z "$1" ]
+    do
+        dig baidu.com @$1 +time=1 > /dev/null && echo "$1 ... ok" && echo "nameserver $1" > /etc/resolv.conf && break
+        echo "$1 ... fail"
+        shift
+    done
 }
 
 ##################################
@@ -99,16 +104,12 @@ case "$1" in
         # else set up route
         ;;
     dns)
-        # set up dns, sometimes dns in zju might fail, here provide some more suggestions
-        # auto test each dns & set up
-        # TODO: auto set
-        zju_test_dns 10.10.0.21
-        zju_test_dns 10.10.0.22
-        zju_test_dns 10.10.0.23
-        zju_test_dns 10.202.68.222
-        # Fallback: 阿里公共解析
-        zju_test_dns 223.5.5.5
-        zju_test_dns 223.6.6.6
+        # 浙大的DNS不是很稳定，这里列了备用方案
+        # 官方 > RQ Lab > ALI YUN
+        zju_test_and_set_up_dns \
+            10.10.0.21 10.10.0.22 10.10.0.23 \
+            10.202.68.222 \
+            223.5.5.5 223.6.6.6 
         ;;
 esac
 
