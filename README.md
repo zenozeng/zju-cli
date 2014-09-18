@@ -1,6 +1,6 @@
 # ZJU CLI Tools
 
-** Note: This repo was moved to https://github.com/QSCTech/zjunet. **
+**Note: This repo was moved to https://github.com/QSCTech/zjunet.**
 
 zju wlan
 
